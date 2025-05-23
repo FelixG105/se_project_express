@@ -17,19 +17,19 @@ mongoose
 app.use(express.json());
 app.use(routes);
 
-app.use('/', mainRouter);
-
 app.use((req, res, next) => {
   req.user = {
-    _id: '68309c95b0a47a96eb79f3d1', // paste the _id of the test user created in the previous step
+    _id: '68309c95b0a47a96eb79f3d1',
   };
   next();
 });
+
+app.use('/', mainRouter);
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
 
 module.exports.createClothingItem = (req, res) => {
-  console.log(req.user._id); 
+  console.log(req.user._id);
 };

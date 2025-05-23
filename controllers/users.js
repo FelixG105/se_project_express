@@ -46,7 +46,4 @@ const getUserById = (req, res) => {
 
 // POST /users
 
-
-
-
 module.exports = { getUsers, createUser, getUserById };
