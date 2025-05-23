@@ -11,6 +11,8 @@ const getUsers = (req, res) => {
     });
 };
 
+// POST /users
+
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
 
@@ -27,7 +29,7 @@ const createUser = (req, res) => {
 
 const getUserById = (req, res) => {
   const { userId } = req.params;
-  User.findById(getUserById)
+  User.findById(userId)
     .orFail()
     .then((user) => res.status(200).send(user))
     .catch((err) => {
@@ -41,5 +43,10 @@ const getUserById = (req, res) => {
       return res.status(500).send({ message: err.message });
     });
 };
+
+// POST /users
+
+
+
 
 module.exports = { getUsers, createUser, getUserById };
