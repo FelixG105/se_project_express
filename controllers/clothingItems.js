@@ -1,4 +1,5 @@
 const ClothingItem = require('../models/clothingItem');
+const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require('../utils/errors');
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -10,8 +11,8 @@ const createItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
-      } else res.status(500).send({ message: err.message });
+        res.status(BAD_REQUEST).send({ message: err.message });
+      } else res.status(SERVER_ERROR).send({ message: err.message });
     });
 };
 
@@ -21,7 +22,7 @@ const getItems = (req, res) => {
       res.status(200).send(items);
     })
     .catch((err) => {
-      res.status(500).send({ message: err.message });
+      res.status(SERVER_ERROR).send({ message: err.message });
     });
 };
 
@@ -34,7 +35,7 @@ const updateItem = (req, res) => {
       res.status(200).send(item);
     })
     .catch((err) => {
-      res.status(500).send({ message: err.message });
+      res.status(SERVER_ERROR).send({ message: err.message });
     });
 };
 
@@ -48,10 +49,10 @@ const deleteItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
+        res.status(BAD_REQUEST).send({ message: err.message });
       } else if (err.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: err.message });
-      } else res.status(500).send({ message: err.message });
+        res.status(NOT_FOUND).send({ message: err.message });
+      } else res.status(SERVER_ERROR).send({ message: err.message });
     });
 };
 
@@ -72,10 +73,10 @@ const likeItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
+        res.status(BAD_REQUEST).send({ message: err.message });
       } else if (err.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: err.message });
-      } else res.status(500).send({ message: err.message });
+        res.status(NOT_FOUND).send({ message: err.message });
+      } else res.status(SERVER_ERROR).send({ message: err.message });
     });
 };
 
@@ -98,10 +99,10 @@ const unlikeItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
+        res.status(BAD_REQUEST).send({ message: err.message });
       } else if (err.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: err.message });
-      } else res.status(500).send({ message: err.message });
+        res.status(NOT_FOUND).send({ message: err.message });
+      } else res.status(SERVER_ERROR).send({ message: err.message });
     });
 };
 
