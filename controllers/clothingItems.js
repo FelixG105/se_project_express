@@ -9,7 +9,9 @@ const createItem = (req, res) => {
       res.status(201).send({ data: item });
     })
     .catch((err) => {
-      res.status(500).send({ message: err.message });
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: err.message });
+      } else res.status(500).send({ message: err.message });
     });
 };
 
@@ -45,8 +47,69 @@ const deleteItem = (req, res) => {
       res.status(200).send(item);
     })
     .catch((err) => {
-      res.status(500).send({ message: err.message });
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        res.status(400).send({ message: err.message });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: err.message });
+      } else res.status(500).send({ message: err.message });
     });
 };
 
-module.exports = { createItem, getItems, updateItem, deleteItem };
+const likeItem = (req, res) => {
+  const owner = req.user._id;
+  const { itemId } = req.params;
+
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    {
+      $addToSet: { likes: owner },
+    },
+    { new: true }
+  )
+    .orFail()
+    .then((item) => {
+      res.status(200).send(item);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        res.status(400).send({ message: err.message });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: err.message });
+      } else res.status(500).send({ message: err.message });
+    });
+};
+
+const unlikeItem = (req, res) => {
+  const owner = req.user._id;
+  const { itemId } = req.params;
+
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    {
+      $pull: { likes: owner },
+    },
+    {
+      new: true,
+    }
+  )
+    .orFail()
+    .then((item) => {
+      res.status(200).send(item);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        res.status(400).send({ message: err.message });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: err.message });
+      } else res.status(500).send({ message: err.message });
+    });
+};
+
+module.exports = {
+  createItem,
+  getItems,
+  updateItem,
+  deleteItem,
+  likeItem,
+  unlikeItem,
+};

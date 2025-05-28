@@ -36,7 +36,4 @@ app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
 
-module.exports.createClothingItem = (req, res) => {
-  console.log(req.user._id);
-  res.status(200).send({ message: 'Clothing item created Successfully' });
-};
+
