@@ -11,31 +11,23 @@ const createItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: err.message });
-      } else res.status(SERVER_ERROR).send({ message: err.message });
+        res.status(BAD_REQUEST).send({ message: 'Invalid data' });
+      } else
+        res
+          .status(SERVER_ERROR)
+          .send({ message: 'An error has occurred on the server' });
     });
 };
 
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => {
-      res.status(200).send(items);
+      res.send(items);
     })
-    .catch((err) => {
-      res.status(SERVER_ERROR).send({ message: err.message });
-    });
-};
-
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-    .orFail()
-    .then((item) => {
-      res.status(200).send(item);
-    })
-    .catch((err) => {
-      res.status(SERVER_ERROR).send({ message: err.message });
+    .catch(() => {
+      res
+        .status(SERVER_ERROR)
+        .send({ message: 'An error has occurred on the server' });
     });
 };
 
@@ -45,7 +37,7 @@ const deleteItem = (req, res) => {
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then((item) => {
-      res.status(200).send(item);
+      res.send(item);
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
@@ -109,7 +101,6 @@ const unlikeItem = (req, res) => {
 module.exports = {
   createItem,
   getItems,
-  updateItem,
   deleteItem,
   likeItem,
   unlikeItem,
