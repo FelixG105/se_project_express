@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const mainRouter = require('./routes/index');
-const { createUser, login } = require('./controllers/users');
+const { createUser, login, getCurrentUser } = require('./controllers/users');
 const authUser = require('./middlewares/auth');
 
 const app = express();
@@ -20,15 +20,17 @@ app.use(express.json());
 
 // Sign in
 app.post('/signin', login);
-
 // Sign up
 app.post('/signup', createUser);
 
-// Auth Middleware
+// **** Auth Middleware *****
 app.use(authUser);
 
 // Main app router
 app.use('/', mainRouter);
+
+// Get Current User
+app.get('/users/me', getCurrentUser);
 
 // Start server
 app.listen(PORT, () => {

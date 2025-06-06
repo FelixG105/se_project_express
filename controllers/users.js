@@ -22,7 +22,12 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   User.create({ name, avatar, email, password })
-    .then((user) => res.status(201).send(user))
+
+    .then((user) => {
+      const userNoPassword = user.toObject();
+      delete userNoPassword.password;
+      res.status(201).send(userNoPassword);
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === 'ValidationError') {
@@ -37,9 +42,10 @@ const createUser = (req, res) => {
     });
 };
 
-const getUserById = (req, res) => {
-  const { userId } = req.params;
-  User.findById(userId)
+const getCurrentUser = (req, res) => {
+  const { _id } = req.user;
+  User.findById(_id)
+    .select('-password')
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
@@ -57,6 +63,7 @@ const getUserById = (req, res) => {
 const login = (req, res) => {
   const { email, password } = req.body;
   User.findUserByCredentials({ email, password })
+    .select('-password')
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
         expiresIn: '7d',
@@ -72,4 +79,4 @@ const login = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getUserById, login };
+module.exports = { getUsers, createUser, getCurrentUser, login };
