@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 const User = require('../models/user');
 const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require('../utils/errors');
 
@@ -17,14 +19,17 @@ const getUsers = (req, res) => {
 // POST /users
 
 const createUser = (req, res) => {
-  const { name, avatar } = req.body;
+  const { name, avatar, email, password } = req.body;
 
-  User.create({ name, avatar })
+  User.create({ name, avatar, email, password })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       console.error(err);
       if (err.name === 'ValidationError') {
         return res.status(BAD_REQUEST).send({ message: 'Invalid data' });
+      }
+      if (err.code === 11000) {
+        return res.status(409).send({ message: 'User email already in use' });
       }
       return res
         .status(SERVER_ERROR)
@@ -49,6 +54,22 @@ const getUserById = (req, res) => {
     });
 };
 
-// POST /users
+const login = (req, res) => {
+  const { email, password } = req.body;
+  User.findUserByCredentials({ email, password })
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: '7d',
+      });
+      res.status(200).send({ user, token });
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.name === 'ValidationError') {
+        return res.status(BAD_REQUEST).send({ message: err.message });
+      }
+      return res.status(SERVER_ERROR).send({ message: err.message });
+    });
+};
 
-module.exports = { getUsers, createUser, getUserById };
+module.exports = { getUsers, createUser, getUserById, login };
