@@ -65,8 +65,8 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.name === 'ValidationError') {
-        return res.status(BAD_REQUEST).send({ message: err.message });
+      if (err.name === 'AuthenticationFailed') {
+        return res.status(401).send({ message: err.message });
       }
       return res.status(SERVER_ERROR).send({ message: err.message });
     });
