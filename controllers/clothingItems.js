@@ -40,7 +40,7 @@ const deleteItem = (req, res) => {
       if (item.owner.toString() === req.user._id.toString()) {
         res.send(item);
       }
-      return res.status(401).send({ message: 'Unathorized user' });
+      return res.status(UNAUTHORIZED).send({ message: 'Unathorized user' });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {

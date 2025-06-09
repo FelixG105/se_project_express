@@ -1,7 +1,12 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const User = require('../models/user');
-const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require('../utils/errors');
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  SERVER_ERROR,
+  DUPLICATE_ERROR,
+} = require('../utils/errors');
 
 // GET /users
 
@@ -34,7 +39,9 @@ const createUser = (req, res) => {
         return res.status(BAD_REQUEST).send({ message: 'Invalid data' });
       }
       if (err.code === 11000) {
-        return res.status(409).send({ message: 'User email already in use' });
+        return res
+          .status(DUPLICATE_ERROR)
+          .send({ message: 'User email already in use' });
       }
       return res
         .status(SERVER_ERROR)
@@ -77,7 +84,7 @@ const login = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === 'AuthenticationFailed') {
-        return res.status(400).send({ message: err.message });
+        return res.status(BAD_REQUEST).send({ message: err.message });
       }
       return res.status(SERVER_ERROR).send({ message: err.message });
     });
