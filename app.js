@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config();
 const mainRouter = require('./routes/index');
 const {
   createUser,
@@ -35,14 +36,14 @@ app.post('/signup', createUser);
 // **** Auth Middleware *****
 app.use(authUser);
 
-// Main app router
-app.use('/', mainRouter);
-
 // Get Current User
 app.get('/users/me', getCurrentUser);
 
 // PATCH update profile
-app.post('/users/me', updateProfile);
+app.patch('/users/me', updateProfile);
+
+// Main app router
+app.use('/', mainRouter);
 
 // Start server
 app.listen(PORT, () => {

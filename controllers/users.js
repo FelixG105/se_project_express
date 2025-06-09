@@ -62,8 +62,12 @@ const getCurrentUser = (req, res) => {
 
 const login = (req, res) => {
   const { email, password } = req.body;
-  User.findUserByCredentials({ email, password })
-    .select('-password')
+  if (!email || !password) {
+    return res
+      .status(400)
+      .send({ message: 'User email or password not provided' });
+  }
+  return User.findUserByCredentials({ email, password })
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
         expiresIn: '7d',
@@ -73,7 +77,7 @@ const login = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === 'AuthenticationFailed') {
-        return res.status(401).send({ message: err.message });
+        return res.status(400).send({ message: err.message });
       }
       return res.status(SERVER_ERROR).send({ message: err.message });
     });
@@ -93,7 +97,7 @@ const updateProfile = (req, res) => {
       if (!user) {
         return res.status(NOT_FOUND).send({ message: 'User not found' });
       }
-      return res.send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
       console.error(err);
