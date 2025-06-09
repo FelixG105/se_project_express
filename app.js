@@ -24,6 +24,9 @@ mongoose
 // Middleware to parse JSON
 app.use(express.json());
 
+// cors
+app.use(cors());
+
 // Sign in
 app.post('/signin', login);
 // Sign up
@@ -31,9 +34,6 @@ app.post('/signup', createUser);
 
 // **** Auth Middleware *****
 app.use(authUser);
-
-// cors
-app.use(cors());
 
 // Main app router
 app.use('/', mainRouter);
