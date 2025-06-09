@@ -60,7 +60,7 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(
     });
 };
 
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function encryptPassword(next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);
   }

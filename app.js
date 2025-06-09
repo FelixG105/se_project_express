@@ -2,7 +2,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const mainRouter = require('./routes/index');
-const { createUser, login, getCurrentUser } = require('./controllers/users');
+const {
+  createUser,
+  login,
+  getCurrentUser,
+  updateProfile,
+} = require('./controllers/users');
 const authUser = require('./middlewares/auth');
 
 const app = express();
@@ -35,6 +40,9 @@ app.use('/', mainRouter);
 
 // Get Current User
 app.get('/users/me', getCurrentUser);
+
+// PATCH update profile
+app.post('/users/me', updateProfile);
 
 // Start server
 app.listen(PORT, () => {

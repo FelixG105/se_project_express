@@ -3,6 +3,5 @@ const router = require('express').Router();
 
 // router.get('/users/me', getCurrentUser);
 
-router.post('/users/me', '');
 
 module.exports = router;
