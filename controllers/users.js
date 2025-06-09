@@ -79,4 +79,29 @@ const login = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getCurrentUser, login };
+// PATCH - update profile
+
+const updateProfile = (req, res) => {
+  const { _id } = req.user;
+  const { name, avatar } = req.body;
+  User.findByIdAndUpdate(
+    _id,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
+    .then((user) => {
+      if (!user) {
+        return res.status(NOT_FOUND).send({ message: 'User not found' });
+      }
+      return res.send(user);
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.name === 'CastError') {
+        return res.status(BAD_REQUEST).send({ message: err.message });
+      }
+      return res.status(SERVER_ERROR).send({ message: err.message });
+    });
+};
+
+module.exports = { getUsers, createUser, getCurrentUser, login, updateProfile };
