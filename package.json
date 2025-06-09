@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/FelixG105/se_project_express#readme",
   "dependencies": {
-    "bcrypt": "^6.0.0",
+    "bcryptjs": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
