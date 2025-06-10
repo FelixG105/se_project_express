@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { UNAUTHORIZED } = require('../utils/errors');
+const { JWT_SECRET } = require('../utils/config');
 
 const authUser = (req, res, next) => {
   const { authorization } = req.headers;
@@ -12,7 +13,7 @@ const authUser = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, process.env.JWT_SECRET);
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     return res
       .status(UNAUTHORIZED)

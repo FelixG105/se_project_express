@@ -3,13 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const mainRouter = require('./routes/index');
-const {
-  createUser,
-  login,
-  getCurrentUser,
-  updateProfile,
-} = require('./controllers/users');
-const authUser = require('./middlewares/auth');
+const { createUser, login } = require('./controllers/users');
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -32,15 +26,6 @@ app.use(cors());
 app.post('/signin', login);
 // Sign up
 app.post('/signup', createUser);
-
-// **** Auth Middleware *****
-app.use(authUser);
-
-// Get Current User
-app.get('/users/me', getCurrentUser);
-
-// PATCH update profile
-app.patch('/users/me', updateProfile);
 
 // Main app router
 app.use('/', mainRouter);

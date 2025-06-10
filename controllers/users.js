@@ -6,20 +6,9 @@ const {
   NOT_FOUND,
   SERVER_ERROR,
   DUPLICATE_ERROR,
+  UNAUTHORIZED,
 } = require('../utils/errors');
-
-// GET /users
-
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.send(users))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(SERVER_ERROR)
-        .send({ message: 'An error has occurred on the server' });
-    });
-};
+const JWT_SECRET = require('../utils/config');
 
 // POST /users
 
@@ -71,20 +60,20 @@ const login = (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res
-      .status(400)
+      .status(BAD_REQUEST)
       .send({ message: 'User email or password not provided' });
   }
   return User.findUserByCredentials({ email, password })
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: '7d',
       });
-      res.status(200).send({ user, token });
+      res.status(200).send({ token });
     })
     .catch((err) => {
       console.error(err);
       if (err.name === 'AuthenticationFailed') {
-        return res.status(BAD_REQUEST).send({ message: err.message });
+        return res.status(UNAUTHORIZED).send({ message: err.message });
       }
       return res.status(SERVER_ERROR).send({ message: err.message });
     });
@@ -111,8 +100,11 @@ const updateProfile = (req, res) => {
       if (err.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: err.message });
       }
+      if (err.name === 'ValidationError') {
+        return res.status(BAD_REQUEST).send({ message: 'Invalid data' });
+      }
       return res.status(SERVER_ERROR).send({ message: err.message });
     });
 };
 
-module.exports = { getUsers, createUser, getCurrentUser, login, updateProfile };
+module.exports = { createUser, getCurrentUser, login, updateProfile };

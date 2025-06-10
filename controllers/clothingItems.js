@@ -3,7 +3,7 @@ const {
   BAD_REQUEST,
   NOT_FOUND,
   SERVER_ERROR,
-  UNAUTHORIZED,
+  FORBIDDEN,
 } = require('../utils/errors');
 
 const createItem = (req, res) => {
@@ -39,13 +39,15 @@ const getItems = (req, res) => {
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
-      if (item.owner.toString() === req.user._id.toString()) {
-        res.send(item);
+      if (item.owner.toString() !== req.user._id.toString()) {
+        return res.status(FORBIDDEN).send({ message: 'Action is Forbidden' });
       }
-      return res.status(UNAUTHORIZED).send({ message: 'Unathorized user' });
+      return item.deleteOne().then(() => {
+        res.status(200).send({ message: 'Successfully deleted' });
+      });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {

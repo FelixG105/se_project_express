@@ -7,12 +7,16 @@ const {
   likeItem,
   unlikeItem,
 } = require('../controllers/clothingItems');
-
-// Create
-router.post('/', createItem);
+const authUser = require('../middlewares/auth');
 
 // Read
 router.get('/', getItems);
+
+// Auth middleware
+router.use('/', authUser);
+
+// Create
+router.post('/', createItem);
 
 // Delete
 router.delete('/:itemId', deleteItem);
