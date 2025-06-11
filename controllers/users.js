@@ -8,7 +8,7 @@ const {
   DUPLICATE_ERROR,
   UNAUTHORIZED,
 } = require('../utils/errors');
-const JWT_SECRET = require('../utils/config');
+const { JWT_SECRET } = require('../utils/config');
 
 // POST /users
 
