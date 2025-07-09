@@ -6,9 +6,9 @@ const authUser = require('../middlewares/auth');
 router.use(authUser);
 
 // Get Current User
-router.get('/users/me', getCurrentUser);
+router.get('/me', getCurrentUser);
 
 // PATCH update profile
-router.patch('/users/me', updateProfile);
+router.patch('/me', updateProfile);
 
 module.exports = router;
