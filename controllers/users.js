@@ -15,26 +15,34 @@ const { JWT_SECRET } = require('../utils/config');
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  User.create({ name, avatar, email, password })
+  console.log('createUser received:', req.body);
 
+  User.create({
+    name,
+    avatar,
+    email,
+    password,
+  })
     .then((user) => {
+      console.log('User created:', user);
       const userNoPassword = user.toObject();
       delete userNoPassword.password;
       res.status(201).send(userNoPassword);
     })
     .catch((err) => {
-      console.error(err);
+      console.error('Error in createUser:', err);
+
       if (err.name === 'ValidationError') {
         return res.status(BAD_REQUEST).send({ message: 'Invalid data' });
       }
+
       if (err.code === 11000) {
         return res
           .status(DUPLICATE_ERROR)
-          .send({ message: 'User email already in use' });
+          .send({ message: 'Email already in use' });
       }
-      return res
-        .status(SERVER_ERROR)
-        .send({ message: 'An error has occurred on the server' });
+
+      return res.status(SERVER_ERROR).send({ message: 'Server error' });
     });
 };
 
@@ -43,7 +51,11 @@ const getCurrentUser = (req, res) => {
   User.findById(_id)
     .select('-password')
     .orFail()
-    .then((user) => res.send(user))
+    .then((user) => {
+      console.log('Returning user:', user);
+      res.send(user);
+    })
+
     .catch((err) => {
       console.error(err);
       if (err.name === 'DocumentNotFoundError') {
