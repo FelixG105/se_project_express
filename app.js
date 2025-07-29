@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+const { errors } = require('celebrate');
 const mainRouter = require('./routes/index');
 const { createUser, login } = require('./controllers/users');
 const errorHandler = require('./middlewares/errorhandler');
@@ -31,6 +32,7 @@ app.post('/signup', createUser);
 // Main app router
 app.use('/', mainRouter);
 
+app.use(errors());
 app.use(errorHandler);
 
 // Start server
