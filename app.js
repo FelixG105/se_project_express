@@ -4,6 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 const mainRouter = require('./routes/index');
 const { createUser, login } = require('./controllers/users');
+const errorHandler = require('./middlewares/errorhandler');
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -29,6 +30,8 @@ app.post('/signup', createUser);
 
 // Main app router
 app.use('/', mainRouter);
+
+app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {

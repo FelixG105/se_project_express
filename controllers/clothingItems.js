@@ -1,12 +1,8 @@
 const ClothingItem = require('../models/clothingItem');
-const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  SERVER_ERROR,
-  FORBIDDEN,
-} = require('../utils/errors');
+const { BAD_REQUEST, NOT_FOUND, FORBIDDEN } = require('../utils/errors');
+const CustomError = require('../utils/customError');
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
 
@@ -16,27 +12,21 @@ const createItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Invalid data' });
-      } else
-        res
-          .status(SERVER_ERROR)
-          .send({ message: 'An error has occurred on the server' });
+        return next(new CustomError('Invalid data', BAD_REQUEST));
+      }
+      return next(err); // will default to 500 if no statusCode
     });
 };
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => {
       res.send(items);
     })
-    .catch(() => {
-      res
-        .status(SERVER_ERROR)
-        .send({ message: 'An error has occurred on the server' });
-    });
+    .catch(next);
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
 
   ClothingItem.findById(itemId)
@@ -51,14 +41,16 @@ const deleteItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: err.message });
-      } else if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND).send({ message: err.message });
-      } else res.status(SERVER_ERROR).send({ message: err.message });
+        return next(new CustomError(err.message, BAD_REQUEST));
+      }
+      if (err.name === 'DocumentNotFoundError') {
+        return next(new CustomError(err.message, NOT_FOUND));
+      }
+      return next(err);
     });
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   const owner = req.user._id;
   const { itemId } = req.params;
 
@@ -75,14 +67,16 @@ const likeItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: err.message });
-      } else if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND).send({ message: err.message });
-      } else res.status(SERVER_ERROR).send({ message: err.message });
+        return next(new CustomError(err.message, BAD_REQUEST));
+      }
+      if (err.name === 'DocumentNotFoundError') {
+        return next(new CustomError(err.message, NOT_FOUND));
+      }
+      return next(err);
     });
 };
 
-const unlikeItem = (req, res) => {
+const unlikeItem = (req, res, next) => {
   const owner = req.user._id;
   const { itemId } = req.params;
 
@@ -101,10 +95,12 @@ const unlikeItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: err.message });
-      } else if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND).send({ message: err.message });
-      } else res.status(SERVER_ERROR).send({ message: err.message });
+        return next(new CustomError(err.message, BAD_REQUEST));
+      }
+      if (err.name === 'DocumentNotFoundError') {
+        return next(new CustomError(err.message, NOT_FOUND));
+      }
+      return next(err);
     });
 };
 

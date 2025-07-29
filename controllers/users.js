@@ -4,18 +4,16 @@ const User = require('../models/user');
 const {
   BAD_REQUEST,
   NOT_FOUND,
-  SERVER_ERROR,
   DUPLICATE_ERROR,
   UNAUTHORIZED,
 } = require('../utils/errors');
 const { JWT_SECRET } = require('../utils/config');
+const CustomError = require('../utils/customError');
 
 // POST /users
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
-
-  console.log('createUser received:', req.body);
 
   User.create({
     name,
@@ -24,51 +22,42 @@ const createUser = (req, res) => {
     password,
   })
     .then((user) => {
-      console.log('User created:', user);
       const userNoPassword = user.toObject();
       delete userNoPassword.password;
       res.status(201).send(userNoPassword);
     })
     .catch((err) => {
-      console.error('Error in createUser:', err);
-
       if (err.name === 'ValidationError') {
-        return res.status(BAD_REQUEST).send({ message: 'Invalid data' });
+        return next(new CustomError('Invalid data', BAD_REQUEST));
       }
-
       if (err.code === 11000) {
-        return res
-          .status(DUPLICATE_ERROR)
-          .send({ message: 'Email already in use' });
+        return next(new CustomError('Email already in use', DUPLICATE_ERROR));
       }
-
-      return res.status(SERVER_ERROR).send({ message: 'Server error' });
+      return next(err);
     });
 };
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   const { _id } = req.user;
   User.findById(_id)
     .select('-password')
     .orFail()
     .then((user) => {
-      console.log('Returning user:', user);
       res.send(user);
     })
 
     .catch((err) => {
-      console.error(err);
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(NOT_FOUND).send({ message: err.message });
+        return next(new CustomError(err.message, NOT_FOUND));
       }
       if (err.name === 'CastError') {
-        return res.status(BAD_REQUEST).send({ message: err.message });
+        return next(new CustomError(err.message, BAD_REQUEST));
       }
-      return res.status(SERVER_ERROR).send({ message: err.message });
+      return next(err);
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res
@@ -83,17 +72,16 @@ const login = (req, res) => {
       res.status(200).send({ token });
     })
     .catch((err) => {
-      console.error(err);
       if (err.name === 'AuthenticationFailed') {
-        return res.status(UNAUTHORIZED).send({ message: err.message });
+        return next(new CustomError(err.message, UNAUTHORIZED));
       }
-      return res.status(SERVER_ERROR).send({ message: err.message });
+      return next(err);
     });
 };
 
 // PATCH - update profile
 
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const { _id } = req.user;
   const { name, avatar } = req.body;
   User.findByIdAndUpdate(
@@ -109,13 +97,13 @@ const updateProfile = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.name === 'CastError') {
-        return res.status(BAD_REQUEST).send({ message: err.message });
-      }
       if (err.name === 'ValidationError') {
-        return res.status(BAD_REQUEST).send({ message: 'Invalid data' });
+        return next(new CustomError('Invalid data', BAD_REQUEST));
       }
-      return res.status(SERVER_ERROR).send({ message: err.message });
+      if (err.name === 'CastError') {
+        return next(new CustomError(err.message, BAD_REQUEST));
+      }
+      return next(err);
     });
 };
 
