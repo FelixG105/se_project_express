@@ -6,6 +6,7 @@ const { errors } = require('celebrate');
 const mainRouter = require('./routes/index');
 const { createUser, login } = require('./controllers/users');
 const errorHandler = require('./middlewares/errorhandler');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -24,6 +25,9 @@ app.use(express.json());
 // cors
 app.use(cors());
 
+// Request Logger
+app.use(requestLogger);
+
 // Sign in
 app.post('/signin', login);
 // Sign up
@@ -32,6 +36,10 @@ app.post('/signup', createUser);
 // Main app router
 app.use('/', mainRouter);
 
+// Error Logger
+app.use(errorLogger);
+
+// Celebrate Validation error handler
 app.use(errors());
 
 app.use((req, res, next) => {
