@@ -1,8 +1,10 @@
 const router = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
 const { getCurrentUser, updateProfile } = require('../controllers/users');
 const authUser = require('../middlewares/auth');
-const { headerValidator } = require('./clothingItems');
+const {
+  headerValidator,
+  updateUserValidator,
+} = require('../middlewares/validators');
 
 // Auth Middleware
 router.use(headerValidator, authUser);
@@ -11,17 +13,6 @@ router.use(headerValidator, authUser);
 router.get('/me', getCurrentUser);
 
 // PATCH update profile
-router.patch(
-  '/me',
-  celebrate({
-    body: Joi.object()
-      .keys({
-        name: Joi.string().min(2).max(30),
-        avatar: Joi.string().uri(),
-      })
-      .min(1),
-  }),
-  updateProfile
-);
+router.patch('/me', updateUserValidator, updateProfile);
 
 module.exports = router;
