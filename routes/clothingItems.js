@@ -14,11 +14,11 @@ const {
   getItemsQueryValidator,
 } = require('../middlewares/validators');
 
-// Auth middleware
-router.use('/', headerValidator, authUser);
-
 // Read
 router.get('/', getItemsQueryValidator, getItems);
+
+// Auth middleware
+router.use('/', headerValidator, authUser);
 
 // Create
 router.post('/', createItemValidator, createItem);
