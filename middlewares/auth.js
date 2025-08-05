@@ -4,6 +4,7 @@ const { UNAUTHORIZED } = require('../utils/errors');
 const { JWT_SECRET } = require('../utils/config');
 
 const authUser = (req, res, next) => {
+  console.log('authUser Middleware attached');
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer')) {
