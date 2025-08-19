@@ -8,12 +8,12 @@ WTWR is an app that assists users in choosing what clothing items to wear based 
 
 Technlogies used for this application include Node, Express, and MongoDB to help build a RESTful API that will be used for set up, defining routes, and store data.
 
-## Running the Project
+## Deployed Project Domain
 
-`npm run start` — to launch the server
+The deployed project's domain name can be found here: 
 
-`npm run dev` — to launch the server with the hot reload feature
+https://wtwrfg.twilightparadox.com
 
-### Testing
+A link to the frontend GitHub repo can be found here: 
 
-Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
+https://github.com/FelixG105/se_project_react
