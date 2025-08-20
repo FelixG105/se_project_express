@@ -14,7 +14,7 @@ const createItem = (req, res, next) => {
       if (err.name === 'ValidationError') {
         return next(new CustomError('Invalid data', BAD_REQUEST));
       }
-      return next(err); // will default to 500 if no statusCode
+      return next(err);
     });
 };
 
@@ -33,7 +33,7 @@ const deleteItem = (req, res, next) => {
     .orFail()
     .then((item) => {
       if (item.owner.toString() !== req.user._id.toString()) {
-        return res.status(FORBIDDEN).send({ message: 'Action is Forbidden' });
+        throw new CustomError('Action is Forbidden', FORBIDDEN);
       }
       return item.deleteOne().then(() => {
         res.status(200).send({ message: 'Successfully deleted' });

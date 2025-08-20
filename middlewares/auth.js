@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { UNAUTHORIZED } = require('../utils/errors');
+const CustomError = require('../utils/customError');
 const { JWT_SECRET } = require('../utils/config');
 
 const authUser = (req, res, next) => {
@@ -8,7 +9,7 @@ const authUser = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer')) {
-    return res.status(UNAUTHORIZED).send({ message: 'Authorization required' });
+    return next(new CustomError('Authorization required', UNAUTHORIZED));
   }
   const token = authorization.replace('Bearer ', '');
   let payload;
@@ -16,9 +17,7 @@ const authUser = (req, res, next) => {
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    return res
-      .status(UNAUTHORIZED)
-      .json({ message: 'Invalid or expired token' });
+    return next(new CustomError('Invalid or expired token', UNAUTHORIZED));
   }
 
   req.user = payload;

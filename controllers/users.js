@@ -60,9 +60,9 @@ const getCurrentUser = (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res
-      .status(BAD_REQUEST)
-      .send({ message: 'User email or password not provided' });
+    return next(
+      new CustomError('User email or password not provided', BAD_REQUEST)
+    );
   }
   return User.findUserByCredentials({ email, password })
     .then((user) => {
@@ -91,9 +91,9 @@ const updateProfile = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND).send({ message: 'User not found' });
+        throw new CustomError('User not found', NOT_FOUND);
       }
-      return res.status(200).send(user);
+      res.status(200).send(user);
     })
     .catch((err) => {
       console.error(err);

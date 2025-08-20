@@ -1,4 +1,3 @@
-
 function errorHandler(err, req, res, next) {
   console.error('Error:', err); // Optional: log for debugging
 
@@ -7,7 +6,7 @@ function errorHandler(err, req, res, next) {
 
   res.status(statusCode).json({
     success: false,
-    error: message,
+    message,
   });
 }
 

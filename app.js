@@ -2,12 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
 const { errors } = require('celebrate');
+const { celebrate, Joi } = require('celebrate');
 const mainRouter = require('./routes/index');
 const { createUser, login } = require('./controllers/users');
 const errorHandler = require('./middlewares/errorhandler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const limiter = require('./middlewares/rateLimiter');
+const securityMiddleware = require('./middlewares/security');
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -36,10 +38,36 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
+// Security
+app.use(securityMiddleware);
+
+// Limiter
+app.use(limiter);
+
 // Sign in
-app.post('/signin', login);
+app.post(
+  '/signin',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().email().required(),
+      password: Joi.string().required(),
+    }),
+  }),
+  login
+);
 // Sign up
-app.post('/signup', createUser);
+app.post(
+  '/signup',
+  celebrate({
+    body: Joi.object().keys({
+      name: Joi.string().min(2).max(30),
+      avatar: Joi.string().uri(),
+      email: Joi.string().email().required(),
+      password: Joi.string().required(),
+    }),
+  }),
+  createUser
+);
 
 // Main app router
 app.use('/', mainRouter);
@@ -49,10 +77,6 @@ app.use(errorLogger);
 
 // Celebrate Validation error handler
 app.use(errors());
-
-app.use((req, res, next) => {
-  res.status(404).send({ message: 'Resource not found' });
-});
 
 app.use(errorHandler);
 
